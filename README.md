@@ -2,19 +2,17 @@
 
 Windows, linux, or mac with python > 3.9 installed
 
-Have a look to this [link](https://learn.microsoft.com/en-us/windows/python/beginners)
-
-It's the method I used
+Have a look to this [link](https://learn.microsoft.com/en-us/windows/python/beginners) for windows
 
 # fanalab profile update
 
-Simple script will update fanalab profile to match your preference and hardware
+This simple script will update fanalab profile to match your preference and hardware
 
 From fanatec forum, it's easy to get a profile for fanalab. Usually it's done for DD2 wheelbase.
 If you want to use it on a DD1, you have to calculate a ration of 1.25 for each profile. 
 This script is doing it automatically.
 
-1. Download a profile zip file (from Maurice B)
+1. Download a profile zip file (from Maurice B) usually first comment after new fanalab release
 2. Extract in the folder orginal inside profiles like this :
    ```   
    profiles
