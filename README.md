@@ -105,3 +105,32 @@ python fanalab-profile.py --rev_limiter
 Activate rev limiter when defined
 
 _*default_ : Disabled
+
+### Wheel LED
+
+```shell
+python fanalab-profile.py --led_race
+python fanalab-profile.py --led_practice
+```
+
+Activate led for race or led practice
+
+Led practice : 
+
+default LED + this change
+      
+- Disable Fuel
+- Disable Position
+- Enable TC change
+- Enable ABS change
+- Enable Engine Map change
+- Enable Brake Bias change
+
+_*default_ : led_race
+
+# My personal preference
+
+Here the command I run to match my preferences.
+```shell
+python fanalab-profile.py --base DD1PS4 --wheel GT3 --pedal CSV3 --sensibility 720 --brf 90 --bli 90 --rev_limiter --led_practice
+```
