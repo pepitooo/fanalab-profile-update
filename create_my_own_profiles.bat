@@ -1,0 +1,1 @@
+python fanalab-profile.py --base DD1PS4 --wheel GT3 --pedal CSV3 --sensibility 720 --brf 90 --bli 90 --rev_limiter --led_practice
