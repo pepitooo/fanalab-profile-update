@@ -31,11 +31,28 @@ This script is doing it automatically.
     ```
 3. Modify .bat file to match your needs
 4. Execute .bat file
-
-Here the command I run to match my preferences.
-```shell
-python fanalab-profile.py --base DD1PS4 --wheel GT3 --pedal CSV3 --sensibility 720 --brf 90 --bli 90 --rev_limiter --led_practice
-```
+5. The sripts will have created a new folder called updated
+   ```   
+   profiles
+   ├── original
+   │   ├── ACC
+   │   ├── AMS2
+   │   ├── F1 2021
+   │   ├── F1 22
+   │   ├── iRacing
+   │   └── rF2
+   ├── updated
+   │   ├── ACC
+   │   ├── AMS2
+   │   ├── F1 2021
+   │   ├── F1 22
+   │   ├── iRacing
+   │   └── rF2
+   create_my_own_profiles.bat
+   fanalab-profile.py
+   README.md
+    ```
+6. import in fanalab the profiles you want
 
 ## Script options
 
