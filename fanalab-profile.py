@@ -1,8 +1,8 @@
 import argparse
 import glob
-import xml.etree.ElementTree as ET
 import os
 import sys
+import xml.etree.ElementTree as ET
 
 BASE_DD1PS4_TYPE = {'BaseType': '7', 'WheelType': '14'}
 BASE_DD1_TYPE = {'BaseType': '7', 'WheelType': '14'}
@@ -54,9 +54,11 @@ def parse_args(args):
         choices=['CSV3'], required=False, default='CSV3')
 
     parser.add_argument('-s', '--sensibility', dest='sensibility', help='Choose your sensibility', type=int, default=1080)
+    parser.add_argument('--mps', dest='mps', help='Choose multi position switch type', type=int, default=2)
 
-    parser.add_argument('--brf', dest='brf', help='Choose your brake force ', type=int, default=60)
+    parser.add_argument('--brf', dest='brf', help='Choose your brake force', type=int, default=60)
     parser.add_argument('--bli', dest='bli', help='Choose your brake level indicator ', type=int, default=101)
+    parser.add_argument('--sho', dest='sho', help='Wheel vibration motor', type=int, default=1)
     parser.add_argument("--rev_limiter", action="store_true", help='Pedal vibrate when rev too high')
 
     parser.add_argument("--led_race", action="store_true", help='Leds for race, fuel, lap, position')
@@ -71,6 +73,8 @@ def main(args):
     wheel_type = get_wheel_type(args_parsed.wheel_type)
     pedal_type = get_pedal_type(args_parsed.pedal_type)
 
+    print(f"Base : {args_parsed.base_type}, pedal : {args_parsed.pedal_type}, wheel : {args_parsed.wheel_type}")
+
     dir_path = r'./profiles/original/*/*.pws'
     res = glob.glob(dir_path)
     for profile_path in res:
@@ -84,11 +88,19 @@ def main(args):
         settings.find('./Device').attrib = base_type | wheel_type | pedal_type
 
         settings.find('./TuningMenu/SEN').text = str(args_parsed.sensibility)
-        if base_type == BASE_DD1_TYPE:
+        if base_type == BASE_DD1_TYPE or base_type == BASE_DD1PS4_TYPE:
             settings.find('./TuningMenu/FF').text = str(int((int(profile_xml.find('./TuningMenu/FF').text) * 1.25)))
 
+        settings.find('./TuningMenu/MPS').text = str(args_parsed.mps)
         settings.find('./TuningMenu/BRF').text = str(args_parsed.brf)
+        settings.find('./TuningMenu/SHO').text = str(args_parsed.sho)
         settings.find('./TuningMenu/ABS').text = str(args_parsed.bli)  # BLI
+
+        if args_parsed.sho:
+            settings.find('./Vibration/SteeringWheel/RevEnabled').text = 'False'
+            settings.find('./Vibration/SteeringWheel/TractionControlEnabled').text = 'True'
+            settings.find('./Vibration/SteeringWheel/TractionControl').text = '10'
+            settings.find('./Vibration/SteeringWheel/TractionControlThreshold').text = '250'
 
         if args_parsed.rev_limiter:
             settings.find('./Vibration/Throttle/RevLimiter').text = 'True'
