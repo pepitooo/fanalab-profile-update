@@ -4,12 +4,16 @@ import xml.etree.ElementTree as ET
 import os
 import sys
 
-BASE_DD1PS4_TYPE = {'BaseType': '7', 'SWType': '11' }
-BASE_DD1_TYPE = {'BaseType': '7', 'SWType': '12' }
-BASE_DD2_TYPE = {'BaseType': '8', 'SWType': '12' }
+BASE_DD1PS4_TYPE = {'BaseType': '7', 'WheelType': '14'}
+BASE_DD1_TYPE = {'BaseType': '7', 'WheelType': '14'}
+BASE_DD2_TYPE = {'BaseType': '8', 'WheelType': '15'}
 
-WHEEL_GT3_TYPE = {'WheelType': '14', 'BME': 'False', 'APM': 'False'}
-WHEEL_F1_V2_TYPE = {'WheelType': '15', 'BME': 'True', 'APM': 'True'}
+
+# BME : Podium Button Module Endurance
+# APM : Advance paddle module
+WHEEL_GT3_TYPE = {'SWType': '11', 'BME': 'False', 'APM': 'False'}
+WHEEL_F1_V2_TYPE = {'SWType': '10', 'BME': 'False', 'APM': 'True'} 
+PODIUM_HUB_TYPE = {'SWType': '12', 'BME': 'False', 'APM': 'False'} 
 
 PEDAL_CS_V3_TYPE = {'PedalType': '3'}
 
