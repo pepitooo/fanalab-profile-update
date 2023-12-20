@@ -1,5 +1,6 @@
 import argparse
 import glob
+import json
 import os
 import sys
 import xml.etree.ElementTree as ET
@@ -67,12 +68,45 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
-def main(args):
-    args_parsed = parse_args(args)
-    base_type = get_base_type(args_parsed.base_type)    
+def update_setting_from_fanlab_below_2v(profile_xml, args_parsed):
+    settings = profile_xml.getroot()
+
+    base_type = get_base_type(args_parsed.base_type)
     wheel_type = get_wheel_type(args_parsed.wheel_type)
     pedal_type = get_pedal_type(args_parsed.pedal_type)
 
+    settings.find('./Device').attrib = base_type | wheel_type | pedal_type
+
+    settings.find('./TuningMenu/SEN').text = str(args_parsed.sensibility)
+    if base_type == BASE_DD1_TYPE or base_type == BASE_DD1PS4_TYPE:
+        settings.find('./TuningMenu/FF').text = str(max(int((int(profile_xml.find('./TuningMenu/FF').text) * 1.25)), 100))
+
+    settings.find('./TuningMenu/MPS').text = str(args_parsed.mps)
+    settings.find('./TuningMenu/BRF').text = str(args_parsed.brf)
+    settings.find('./TuningMenu/SHO').text = str(args_parsed.sho)
+    settings.find('./TuningMenu/ABS').text = str(args_parsed.bli)  # BLI
+
+    if args_parsed.sho:
+        settings.find('./Vibration/SteeringWheel/RevEnabled').text = 'False'
+        settings.find('./Vibration/SteeringWheel/TractionControlEnabled').text = 'True'
+        settings.find('./Vibration/SteeringWheel/TractionControl').text = '10'
+        settings.find('./Vibration/SteeringWheel/TractionControlThreshold').text = '250'
+
+    if args_parsed.rev_limiter:
+        settings.find('./Vibration/Throttle/RevLimiter').text = 'True'
+
+    if args_parsed.led_practice:
+        settings.find('./ThreeDigitLed/Fuel_I').text = '4'
+        settings.find('./ThreeDigitLed/Position').text = '4'
+        settings.find('./ThreeDigitLed/TCGraphics').text = '3'
+        settings.find('./ThreeDigitLed/ABSGraphics').text = '3'
+        settings.find('./ThreeDigitLed/EngineMap').text = '3'
+        settings.find('./ThreeDigitLed/iBrakeBias').text = '1'
+
+    return profile_xml
+
+def main(args):
+    args_parsed = parse_args(args)
     print(f"Base : {args_parsed.base_type}, pedal : {args_parsed.pedal_type}, wheel : {args_parsed.wheel_type}")
 
     dir_path = r'./profiles/original/*/*.pws'
@@ -83,39 +117,13 @@ def main(args):
         except ET.ParseError:
             print(f'file not valid {profile_path}')
             continue
-        settings = profile_xml.getroot()
 
-        settings.find('./Device').attrib = base_type | wheel_type | pedal_type
-
-        settings.find('./TuningMenu/SEN').text = str(args_parsed.sensibility)
-        if base_type == BASE_DD1_TYPE or base_type == BASE_DD1PS4_TYPE:
-            settings.find('./TuningMenu/FF').text = str(int((int(profile_xml.find('./TuningMenu/FF').text) * 1.25)))
-
-        settings.find('./TuningMenu/MPS').text = str(args_parsed.mps)
-        settings.find('./TuningMenu/BRF').text = str(args_parsed.brf)
-        settings.find('./TuningMenu/SHO').text = str(args_parsed.sho)
-        settings.find('./TuningMenu/ABS').text = str(args_parsed.bli)  # BLI
-
-        if args_parsed.sho:
-            settings.find('./Vibration/SteeringWheel/RevEnabled').text = 'False'
-            settings.find('./Vibration/SteeringWheel/TractionControlEnabled').text = 'True'
-            settings.find('./Vibration/SteeringWheel/TractionControl').text = '10'
-            settings.find('./Vibration/SteeringWheel/TractionControlThreshold').text = '250'
-
-        if args_parsed.rev_limiter:
-            settings.find('./Vibration/Throttle/RevLimiter').text = 'True'
-
-        if args_parsed.led_practice:
-            settings.find('./ThreeDigitLed/Fuel_I').text = '4'
-            settings.find('./ThreeDigitLed/Position').text = '4'
-            settings.find('./ThreeDigitLed/TCGraphics').text = '3'
-            settings.find('./ThreeDigitLed/ABSGraphics').text = '3'
-            settings.find('./ThreeDigitLed/EngineMap').text = '3'
-            settings.find('./ThreeDigitLed/iBrakeBias').text = '1'
+        if float(profile_xml.getroot().attrib['Version']) < 3:
+            updated_profile_xml = update_setting_from_fanlab_below_2v(profile_xml, args_parsed)
 
         updated_profile_path = profile_path.replace('/original', '/updated')
         os.makedirs(os.path.dirname(updated_profile_path), exist_ok=True)
-        profile_xml.write(updated_profile_path)
+        updated_profile_xml.write(updated_profile_path)
 
 
 if __name__ == '__main__':
