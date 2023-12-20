@@ -105,6 +105,52 @@ def update_setting_from_fanlab_below_2v(profile_xml, args_parsed):
 
     return profile_xml
 
+
+def update_setting_from_fanlab(profile_xml, args_parsed):
+    settings = profile_xml.getroot()
+
+    base_type = get_base_type(args_parsed.base_type)
+    wheel_type = get_wheel_type(args_parsed.wheel_type)
+    pedal_type = get_pedal_type(args_parsed.pedal_type)
+
+    settings.find('./Device').attrib = base_type | wheel_type | pedal_type
+
+    tuning_menu = json.loads(settings.find('./TuningMenuProfile/JSON').text)
+    tuning_menu['SEN'] = int(str(args_parsed.sensibility)[:3])
+
+    if base_type == BASE_DD1_TYPE or base_type == BASE_DD1PS4_TYPE:
+        tuning_menu['FF'] = max(tuning_menu['FF'] * 1.25, 100)
+
+    tuning_menu['MPS'] = args_parsed.mps
+    tuning_menu['BRF'] = args_parsed.brf
+    tuning_menu['SHO'] = args_parsed.sho
+    tuning_menu['BLI'] = args_parsed.bli
+
+    vibration = json.loads(settings.find('./VibrationProfile/JSON').text)
+    if args_parsed.sho:
+        vibration['ThrottleProfile']['RevEnabled'] = False
+        vibration['SWProfile']['TractionControlEnabled'] = True
+        vibration['SWProfile']['TractionControlStrength'] = 10
+        vibration['SWProfile']['TractionControlDuration'] = 250
+
+    if args_parsed.rev_limiter:
+        vibration['ThrottleProfile']['RevEnabled'] = True
+
+    display_led = json.loads(settings.find('./DisplayLedProfile/JSON').text)
+    if args_parsed.led_practice:
+        display_led['Fuel_I']['Prio'] = 4
+        display_led['Fuel_I']['Fuel_I'] = 4
+        display_led['Fuel_I']['Position'] = 3
+        display_led['Fuel_I']['ABSGraphics'] = 3
+        display_led['Fuel_I']['EngineMap'] = 3
+        display_led['Fuel_I']['iBrakeBias'] = 1
+
+    settings.find('./TuningMenuProfile/JSON').text = json.dumps(tuning_menu)
+    settings.find('./VibrationProfile/JSON').text = json.dumps(vibration)
+    settings.find('./DisplayLedProfile/JSON').text = json.dumps(display_led)
+    return profile_xml
+
+
 def main(args):
     args_parsed = parse_args(args)
     print(f"Base : {args_parsed.base_type}, pedal : {args_parsed.pedal_type}, wheel : {args_parsed.wheel_type}")
@@ -120,6 +166,8 @@ def main(args):
 
         if float(profile_xml.getroot().attrib['Version']) < 3:
             updated_profile_xml = update_setting_from_fanlab_below_2v(profile_xml, args_parsed)
+        else:
+            updated_profile_xml = update_setting_from_fanlab(profile_xml, args_parsed)
 
         updated_profile_path = profile_path.replace('/original', '/updated')
         os.makedirs(os.path.dirname(updated_profile_path), exist_ok=True)
