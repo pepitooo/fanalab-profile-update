@@ -52,6 +52,14 @@ This script is doing it automatically.
     ```
 6. import in fanalab the profiles you want
 
+## Tested Version
+
+- FanaLab 1.66
+- FanaLab 2.01.12 <- don't work properly 
+- FanaLab 2.01.21
+
+Make sure you download the profiles archive from the same forum thread as the FanaLab version.
+
 ## Script options
 
 ### Wheel base 
