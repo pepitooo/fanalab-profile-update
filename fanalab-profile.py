@@ -119,7 +119,7 @@ def update_setting_from_fanlab(profile_xml, args_parsed):
     tuning_menu['SEN'] = int(args_parsed.sensibility/10)
 
     if base_type == BASE_DD1_TYPE or base_type == BASE_DD1PS4_TYPE:
-        tuning_menu['FF'] = max(tuning_menu['FF'] * 1.25, 100)
+        tuning_menu['FF'] = int(min(tuning_menu['FF'] * 1.25, 100))
 
     tuning_menu['MPS'] = args_parsed.mps
     tuning_menu['BRF'] = args_parsed.brf
