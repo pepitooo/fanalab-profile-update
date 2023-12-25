@@ -116,7 +116,7 @@ def update_setting_from_fanlab(profile_xml, args_parsed):
     settings.find('./Device').attrib = base_type | wheel_type | pedal_type
 
     tuning_menu = json.loads(settings.find('./TuningMenuProfile/JSON').text)
-    tuning_menu['SEN'] = int(str(args_parsed.sensibility)[:3])
+    tuning_menu['SEN'] = int(args_parsed.sensibility/10)
 
     if base_type == BASE_DD1_TYPE or base_type == BASE_DD1PS4_TYPE:
         tuning_menu['FF'] = max(tuning_menu['FF'] * 1.25, 100)
